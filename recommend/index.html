@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#B5476B" />
+<title>선택과목 추천 · 2026 속초여고 교육과정 박람회</title>
+<style>
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;background:#fff;color:#2b2310;
+    font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',system-ui,-apple-system,sans-serif;}
+  body{font-size:15px;line-height:1.5;}
+  a{color:inherit;}
+  .rc-page{max-width:1100px;margin:0 auto;padding-bottom:60px;}
+
+  /* 상단 히어로 */
+  .rc-hero{background:linear-gradient(160deg,#FDF1F5 0%,#FBE1EA 45%,#F6C9D9 100%);
+    padding:28px 20px 26px;}
+  .rc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+  .rc-back{border:0;background:rgba(255,255,255,.7);color:#7A3350;font-weight:700;font-size:13px;
+    padding:8px 14px;border-radius:999px;text-decoration:none;cursor:pointer;}
+  .rc-me{font-size:12.5px;font-weight:700;color:#9C5E76;background:rgba(255,255,255,.7);
+    padding:7px 12px;border-radius:999px;}
+  .rc-title{font-size:22px;font-weight:800;color:#7A3350;letter-spacing:-.4px;}
+  .rc-sub{font-size:13.5px;color:#9C5E76;margin-top:6px;line-height:1.5;}
+
+  /* 계열 탭 */
+  .rc-tabs{display:flex;gap:8px;flex-wrap:wrap;padding:16px 20px 0;}
+  .rc-tab{border:1px solid #F0CBD9;background:#fff;color:#9C5E76;font-weight:700;font-size:13px;
+    padding:9px 15px;border-radius:999px;cursor:pointer;white-space:nowrap;}
+  .rc-tab.on{background:#B5476B;border-color:#B5476B;color:#fff;}
+
+  /* 대학 필터 */
+  .rc-uni-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:12px 20px 0;}
+  .rc-uni-label{font-size:12px;font-weight:700;color:#9a895f;margin-right:2px;}
+  .rc-uni-chip{border:1px solid #eee;background:#fff;color:#6b5526;font-weight:700;font-size:12px;
+    padding:6px 12px;border-radius:999px;cursor:pointer;}
+  .rc-uni-chip.on{background:#2b2310;border-color:#2b2310;color:#fff;}
+
+  .rc-count{padding:16px 20px 0;font-size:12.5px;color:#8a7c55;}
+
+  /* 카드 그리드 */
+  .rc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;padding:14px 20px 0;}
+  .rc-card{background:#fff;border:1px solid #f1ece0;border-radius:16px;padding:16px 16px 14px;
+    box-shadow:0 6px 16px rgba(120,100,60,.06);cursor:pointer;text-align:left;font-family:inherit;}
+  .rc-card:hover{border-color:#F0CBD9;}
+  .rc-card-uni{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+  .rc-card-uni img{width:22px;height:22px;object-fit:contain;}
+  .rc-card-uni span{font-size:12.5px;font-weight:800;}
+  .rc-card-mojip{font-size:16px;font-weight:800;color:#2b2310;letter-spacing:-.2px;margin-bottom:4px;}
+  .rc-card-col{font-size:11.5px;color:#9a895f;margin-bottom:8px;}
+  .rc-card-desc{font-size:12.5px;color:#6b5526;line-height:1.5;margin-bottom:10px;}
+  .rc-chips{display:flex;flex-wrap:wrap;gap:5px;}
+  .rc-chip{font-size:11px;font-weight:700;border-radius:8px;padding:3px 8px;white-space:nowrap;}
+  .rc-chip.core{background:#FBE6EE;color:#9C3F61;}
+  .rc-chip.rec{background:#f3efe3;color:#6b5526;}
+  .rc-chip.more{background:#f0f0f0;color:#999;}
+
+  /* 가이드형 카드(서울대/건국대) */
+  .rc-guide{background:#FEFAFC;border:1px dashed #F0CBD9;}
+  .rc-guide .rc-card-mojip{font-size:14px;}
+  .rc-guide ul{margin:0;padding-left:18px;font-size:12px;color:#6b5526;line-height:1.6;}
+
+  .rc-empty{padding:60px 20px;text-align:center;color:#9a895f;font-size:14px;}
+
+  /* 모달 */
+  .rc-modal-bg{position:fixed;inset:0;background:rgba(40,20,30,.45);display:flex;align-items:flex-end;
+    justify-content:center;z-index:20;}
+  @media (min-width:640px){ .rc-modal-bg{align-items:center;} }
+  .rc-modal{background:#fff;width:100%;max-width:520px;max-height:86vh;overflow-y:auto;
+    border-radius:20px 20px 0 0;padding:22px 22px 30px;}
+  @media (min-width:640px){ .rc-modal{border-radius:20px;} }
+  .rc-modal-close{border:0;background:#f3efe3;color:#6b5526;width:32px;height:32px;border-radius:50%;
+    font-size:16px;float:right;cursor:pointer;}
+  .rc-modal-uni{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+  .rc-modal-uni img{width:30px;height:30px;object-fit:contain;}
+  .rc-modal-uni span{font-size:14px;font-weight:800;}
+  .rc-modal-mojip{font-size:20px;font-weight:800;color:#2b2310;margin:4px 0 4px;}
+  .rc-modal-col{font-size:12.5px;color:#9a895f;margin-bottom:12px;}
+  .rc-modal-desc{font-size:13.5px;color:#525252;line-height:1.6;margin-bottom:16px;}
+  .rc-modal-h{font-size:12.5px;font-weight:800;color:#9C3F61;margin:14px 0 6px;}
+  .rc-modal-note{font-size:12px;color:#8a7c55;margin-top:10px;line-height:1.5;}
+
+  .rc-foot{text-align:center;font-size:11px;color:#c4c4c4;padding:30px 20px 10px;line-height:1.6;}
+</style>
+</head>
+<body>
+<div class="rc-page">
+  <div class="rc-hero">
+    <div class="rc-top">
+      <a class="rc-back" href="../index.html">‹ 홈으로</a>
+      <span class="rc-me" id="rcMe" hidden></span>
+    </div>
+    <div class="rc-title">선택과목 추천</div>
+    <div class="rc-sub">가고 싶은 <b>계열</b>을 고르면, 대학별로 공개된 <b>권장·핵심 이수과목</b>을 보여드려요.<br>
+      ※ 대학의 공식 모집요강을 확인하는 참고 자료이며, 우리 학교 개설 여부는 별도로 반영되지 않아요.</div>
+  </div>
+
+  <div class="rc-tabs" id="rcTabs"></div>
+  <div class="rc-uni-row" id="rcUniRow"></div>
+  <div class="rc-count" id="rcCount"></div>
+  <div class="rc-grid" id="rcGrid"></div>
+
+  <div class="rc-foot">2026 속초여고 교육과정 박람회 · 선택과목 추천(대학별 자료)</div>
+</div>
+
+<script src="data.js"></script>
+<script>
+(function () {
+  "use strict";
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = function (s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  };
+
+  var APP = window.APPDATA || { PROGRAMS: [], GUIDE: {}, GYE: [] };
+  var PROGRAMS = APP.PROGRAMS, GUIDE = APP.GUIDE, GYE = APP.GYE;
+
+  var UNIS = ["중앙대학교","고려대학교","동국대학교","경희대학교","서울대학교","건국대학교"];
+  var LOGO = {
+    "중앙대학교": "logo/CAU.svg", "고려대학교": "logo/KOREA.png", "동국대학교": "logo/dongguk.jpg",
+    "경희대학교": "logo/KYUNGHEE.jpg", "서울대학교": "logo/SNU.png", "건국대학교": "logo/KU.png"
+  };
+  var BRAND = {
+    "중앙대학교": "#003DA5", "고려대학교": "#862633", "동국대학교": "#E06C16",
+    "경희대학교": "#8A1E2D", "서울대학교": "#003087", "건국대학교": "#006A3C"
+  };
+
+  // 상단 인사말 (메인 앱과 로그인 세션 공유, 로그인 없이도 둘러볼 수 있음)
+  try {
+    var nm = localStorage.getItem("scwgo_nick_v1");
+    if (nm && nm !== "게스트") {
+      var el = $("rcMe"); el.textContent = nm + " 님, 둘러보는 중"; el.hidden = false;
+    }
+  } catch (e) {}
+
+  var curGye = "전체";
+  var curUni = "전체";
+
+  function uniLogo(u) {
+    return LOGO[u] ? '<img src="' + LOGO[u] + '" alt="" onerror="this.style.display=\'none\'">' : "";
+  }
+
+  function programCard(p) {
+    var core = (p.core || []).slice(0, 4).map(function (s) { return '<span class="rc-chip core">' + esc(s) + '</span>'; }).join("");
+    var recList = p.rec || [];
+    var rec = recList.slice(0, 4).map(function (s) { return '<span class="rc-chip rec">' + esc(s) + '</span>'; }).join("");
+    var more = recList.length > 4 ? '<span class="rc-chip more">+' + (recList.length - 4) + '</span>' : "";
+    return '<button class="rc-card" data-idx="' + p._idx + '">'
+      + '<div class="rc-card-uni">' + uniLogo(p.u) + '<span style="color:' + (BRAND[p.u] || "#666") + '">' + esc(p.u) + '</span></div>'
+      + '<div class="rc-card-mojip">' + esc(p.mojip) + '</div>'
+      + (p.col ? '<div class="rc-card-col">' + esc(p.col) + '</div>' : "")
+      + (p.desc ? '<div class="rc-card-desc">' + esc(p.desc) + '</div>' : "")
+      + '<div class="rc-chips">' + core + rec + more + '</div>'
+      + '</button>';
+  }
+
+  function guideCard(card) {
+    return '<div class="rc-card rc-guide">'
+      + '<div class="rc-card-uni">' + uniLogo(card.u) + '<span style="color:' + (BRAND[card.u] || "#666") + '">' + esc(card.u) + '</span></div>'
+      + '<div class="rc-card-mojip">' + esc(card.f) + '</div>'
+      + '<ul>' + card.lines.map(function (l) { return '<li>' + esc(l) + '</li>'; }).join("") + '</ul>'
+      + '</div>';
+  }
+
+  PROGRAMS.forEach(function (p, i) { p._idx = i; });
+
+  function paintTabs() {
+    var tabs = ["전체"].concat(GYE);
+    $("rcTabs").innerHTML = tabs.map(function (g) {
+      return '<button class="rc-tab' + (g === curGye ? " on" : "") + '" data-g="' + esc(g) + '">' + esc(g) + '</button>';
+    }).join("");
+  }
+  function paintUniRow() {
+    var chips = ["전체"].concat(UNIS).map(function (u) {
+      return '<button class="rc-uni-chip' + (u === curUni ? " on" : "") + '" data-u="' + esc(u) + '">' + esc(u) + '</button>';
+    }).join("");
+    $("rcUniRow").innerHTML = '<span class="rc-uni-label">대학</span>' + chips;
+  }
+
+  function paint() {
+    var progs = PROGRAMS.filter(function (p) {
+      if (curGye !== "전체" && p.g !== curGye) return false;
+      if (curUni !== "전체" && p.u !== curUni) return false;
+      return true;
+    });
+    var guides = (curGye !== "전체" ? (GUIDE[curGye] || []) : Object.keys(GUIDE).reduce(function (acc, g) {
+      return acc.concat(GUIDE[g]);
+    }, [])).filter(function (c) { return curUni === "전체" || c.u === curUni; });
+    // GUIDE 카드는 계열별로 중복 등록되어 있으므로 전체 보기에서는 유니크하게
+    if (curGye === "전체") {
+      var seen = {};
+      guides = guides.filter(function (c) {
+        var k = c.u + "|" + c.f; if (seen[k]) return false; seen[k] = 1; return true;
+      });
+    }
+
+    $("rcCount").textContent = "대학·학과 " + progs.length + "곳" + (guides.length ? " · 안내 " + guides.length + "건" : "");
+
+    if (!progs.length && !guides.length) {
+      $("rcGrid").innerHTML = '<div class="rc-empty">해당 조건에 맞는 자료가 없어요.</div>';
+      return;
+    }
+    $("rcGrid").innerHTML = guides.map(guideCard).join("") + progs.map(programCard).join("");
+  }
+
+  $("rcTabs").addEventListener("click", function (e) {
+    var b = e.target.closest(".rc-tab"); if (!b) return;
+    curGye = b.dataset.g; paintTabs(); paint();
+  });
+  $("rcUniRow").addEventListener("click", function (e) {
+    var b = e.target.closest(".rc-uni-chip"); if (!b) return;
+    curUni = b.dataset.u; paintUniRow(); paint();
+  });
+
+  function openModal(p) {
+    var bg = document.createElement("div");
+    bg.className = "rc-modal-bg";
+    var core = (p.core || []).map(function (s) { return '<span class="rc-chip core">' + esc(s) + '</span>'; }).join("");
+    var rec = (p.rec || []).map(function (s) { return '<span class="rc-chip rec">' + esc(s) + '</span>'; }).join("");
+    bg.innerHTML = '<div class="rc-modal">'
+      + '<button class="rc-modal-close" id="rcModalClose">×</button>'
+      + '<div class="rc-modal-uni">' + uniLogo(p.u) + '<span style="color:' + (BRAND[p.u] || "#666") + '">' + esc(p.u) + '</span></div>'
+      + '<div class="rc-modal-mojip">' + esc(p.mojip) + '</div>'
+      + (p.col ? '<div class="rc-modal-col">' + esc(p.col) + '</div>' : "")
+      + (p.desc ? '<div class="rc-modal-desc">' + esc(p.desc) + '</div>' : "")
+      + (core ? '<div class="rc-modal-h">핵심 이수과목</div><div class="rc-chips">' + core + '</div>' : "")
+      + (rec ? '<div class="rc-modal-h">권장 이수과목</div><div class="rc-chips">' + rec + '</div>' : "")
+      + (p.note ? '<div class="rc-modal-note">' + esc(p.note) + '</div>' : "")
+      + '</div>';
+    document.body.appendChild(bg);
+    bg.addEventListener("click", function (e) { if (e.target === bg) document.body.removeChild(bg); });
+    document.getElementById("rcModalClose").addEventListener("click", function () { document.body.removeChild(bg); });
+  }
+
+  $("rcGrid").addEventListener("click", function (e) {
+    var c = e.target.closest(".rc-card[data-idx]"); if (!c) return;
+    var p = PROGRAMS[+c.dataset.idx]; if (p) openModal(p);
+  });
+
+  paintTabs(); paintUniRow(); paint();
+})();
+</script>
+</body>
+</html>
