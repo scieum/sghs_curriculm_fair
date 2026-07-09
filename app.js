@@ -249,6 +249,7 @@
       hT.textContent = "나의 시간표 확인";
       hS.textContent = "내가 선택한 과목 한눈에";
       menu += menuCard("survey", "pen.png", "1차 수요조사 결과", "학기별 신청 과목");
+      menu += menuCard("ebook", "book.png", "E-Book 바로가기", "전자책 가이드북");
       menu += menuCard("curriculum", "school.png", "우리학교 편제표", "학년별 교육과정");
       menu += menuCard("schedule", "calander.png", "전체 일정 확인", "박람회 타임테이블");
     }
@@ -272,10 +273,10 @@
   var LINKS = {
     metaverse: ""
   };
-  // 학년별 E-Book 가이드북 링크 — TODO: 실제 이북 링크로 교체
+  // 학년별 E-Book 가이드북 (PDF, 앱과 같은 저장소에 Git LFS로 보관)
   var EBOOK = {
-    "1": "",
-    "2": ""
+    "1": "1학년 Ebook.pdf",
+    "2": "2학년 Ebook.pdf"
   };
   // 앱에 내장된 페이지(같은 탭 이동, 로그인 세션 공유)
   var PAGES = {
@@ -312,7 +313,7 @@
 
   // E-Book: 학생은 본인 학년 책으로 바로, 교사는 1·2학년을 좌우 2단으로 임베드
   function ebookCol(grade) {
-    var url = EBOOK[grade];
+    var url = encodeURI(EBOOK[grade]);
     return '<div class="eb-col">'
       + '<div class="eb-h">' + grade + '학년 E-Book'
       +   '<a class="eb-open" href="' + url + '" target="_blank" rel="noopener">새 창으로 열기 ↗</a></div>'
@@ -321,7 +322,14 @@
   }
   function openEbook() {
     var grades = viewGrades();
-    if (grades.length === 1) { window.open(EBOOK[grades[0]], "_blank", "noopener"); return; }
+    if (grades.length === 1) {
+      $("detailTitle").textContent = grades[0] + "학년 E-Book";
+      $("detailBody").innerHTML = ''
+        + '<p class="tt-note"><b>' + grades[0] + '학년 E-Book 가이드북</b>이에요.</p>'
+        + '<div class="eb-grid eb-grid-solo">' + ebookCol(grades[0]) + '</div>';
+      show("detail");
+      return;
+    }
     $("detailTitle").textContent = "E-Book 바로가기";
     $("detailBody").innerHTML = ''
       + '<p class="tt-note"><b>1·2학년 E-Book 가이드북</b>을 좌우로 함께 볼 수 있어요.</p>'
@@ -1359,14 +1367,16 @@
     my = my.slice().sort(function (a, b) { return (SLOT_ORDER[a.time] || 0) - (SLOT_ORDER[b.time] || 0); });
     var rows = my.map(function (d) {
       var i = SLOT_ORDER[d.time] || 0;
+      var hasBooth = d.booth && d.booth !== "공강";
+      var inner = '<span class="t-subj">' + esc(d.booth || "") + '</span>'
+        + (d.room ? '<span class="t-room"><img class="t-pin" src="img/pin.png" alt="" aria-hidden="true">' + esc(d.room) + '</span>' : "");
+      var cell = hasBooth
+        ? '<button class="ro-cell" data-slot="' + esc(d.time || "") + '" data-booth="' + esc(d.booth || "") + '">' + inner + '<span class="ro-go">출석부 ›</span></button>'
+        : '<div class="ro-cell ro-cell-plain">' + inner + '</div>';
       return '<tr>'
         + '<td class="c-time"><span class="t-no">' + esc(d.time || "") + '</span></td>'
         + '<td class="c-when"><span class="t-when">' + (TIME_SLOTS[i] || "") + '</span></td>'
-        + '<td><button class="ro-cell" data-slot="' + esc(d.time || "") + '" data-booth="' + esc(d.booth || "") + '">'
-        +   '<span class="t-subj">' + esc(d.booth || "") + '</span>'
-        +   (d.room ? '<span class="t-room"><img class="t-pin" src="img/pin.png" alt="" aria-hidden="true">' + esc(d.room) + '</span>' : "")
-        +   '<span class="ro-go">출석부 ›</span>'
-        + '</button></td></tr>';
+        + '<td>' + cell + '</td></tr>';
     }).join("");
     $("detailBody").innerHTML = head
       + '<p class="tt-note">선생님이 <b>감독(임장)</b>할 타임과 부스·교실이에요. 과목을 누르면 <b>학생 출석부</b>를 볼 수 있어요.</p>'

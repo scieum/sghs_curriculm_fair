@@ -226,6 +226,7 @@ button{font-family:inherit;}
 .ro-cell .ro-go{flex:0 0 auto;font-size:11px;font-weight:800;color:#A8506E;
   background:#FBEEF3;border-radius:999px;padding:3px 9px;white-space:nowrap;}
 .ro-cell:active{opacity:.6;}
+.ro-cell-plain{cursor:default;opacity:.65;}
 
 /* 출석부 페이지 */
 .ro-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;}
@@ -418,6 +419,8 @@ button{font-family:inherit;}
 #detail .eb-open:active{background:#FDF2F6;}
 #detail .eb-frame{width:100%;height:74vh;min-height:460px;border:1px solid #e3dcca;
   border-radius:12px;background:#fff;box-shadow:0 6px 16px rgba(120,100,60,.06);}
+#detail .eb-grid-solo{display:block;}
+#detail .eb-grid-solo .eb-col{width:100%;}
 @media (max-width:760px){
   #detail .eb-grid{flex-direction:column;}
   #detail .eb-frame{height:62vh;min-height:380px;}
