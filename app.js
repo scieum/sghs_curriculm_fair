@@ -243,19 +243,12 @@
       if (t.homeroom) menu += menuCard("myclass", "compass.png", "우리반 학생 위치", "타임별 이동 현황");
       menu += menuCard("schedule", "pin.png", "전체 일정 확인", "박람회 타임테이블");
       menu += menuCard("subjects", "graph.png", "교과별 부스 배치", "교과·타임별 운영 과목");
-      menu += menuCard("surveyagg", "excel.png", "교과별 신청 인원", "수요조사 집계");
       menu += menuCard("curriculum", "school.png", "우리학교 편제표", "학년별 교육과정");
-      menu += menuCard("ebook", "book.png", "E-Book 바로가기", "전자책 가이드북");
-      menu += menuCard("metaverse", "Metaverse.png", "메타버스 박람회", "가상 공간 입장");
     } else {
       hero.dataset.go = "timetable";
       hT.textContent = "나의 시간표 확인";
       hS.textContent = "내가 선택한 과목 한눈에";
       menu += menuCard("survey", "pen.png", "1차 수요조사 결과", "학기별 신청 과목");
-      menu += menuCard("recommend", "compass.png", "선택과목 추천", "나에게 맞는 과목 찾기");
-      menu += menuCard("holland", "graph.png", "진로 성향 검사", "홀랜드 검사 + 과목 추천");
-      menu += menuCard("ebook", "book.png", "E-Book 바로가기", "전자책 가이드북");
-      menu += menuCard("metaverse", "Metaverse.png", "메타버스 박람회", "가상 공간 입장");
       menu += menuCard("curriculum", "school.png", "우리학교 편제표", "학년별 교육과정");
       menu += menuCard("schedule", "calander.png", "전체 일정 확인", "박람회 타임테이블");
     }
@@ -752,6 +745,15 @@
       for (var i = 0; i < cr.length; i++) if ((cr[i].textContent || "").trim() !== "") return true;  // 내용 있는 이수학점 = 새 그룹
       return false;
     }
+    // 이 행의 '어느 학기 열이든' 새 [택N] 표시가 있으면 다음 선택그룹 시작으로 간주
+    // (같은 pj-sec 구획 안에서도 학기별로 여러 [택N] 그룹이 순서대로 나열되므로,
+    //  기존 그룹 열만 보면 다른 열의 새 그룹 과목들까지 잘못 흡수됨)
+    function hasPick(r) {
+      if (!rows[r]) return false;
+      var sems = rows[r].querySelectorAll("td.pj-sem");
+      for (var i = 0; i < sems.length; i++) if ((sems[i].textContent || "").indexOf("택") !== -1) return true;
+      return false;
+    }
 
     // 병합 계획을 먼저 세운 뒤 일괄 적용 (DOM 변경이 격자 계산에 영향 주지 않도록)
     var plans = [];
@@ -763,9 +765,9 @@
         var col = colOf(r2, td), remove = [];
         for (var rr = r2 + 1; rr < rows.length; rr++) {
           if (boundary(rr)) break;                              // 다음 선택그룹/구분 시작 → 종료
+          if (hasPick(rr)) break;                               // 다른 열의 새 [택N] 그룹 시작 → 종료
           var below = (grid[rr] || [])[col];
           if (!below || below.tagName !== "TD" || below.className.indexOf("pj-sem") === -1) break;
-          if ((below.textContent || "").indexOf("택") !== -1) break;  // 다음 '택N' 표시 전까지
           remove.push(below);                                   // 그룹 내 같은 열(빈칸·부수 숫자) 흡수
         }
         plans.push({ td: td, span: 1 + remove.length, remove: remove, txt: txt });

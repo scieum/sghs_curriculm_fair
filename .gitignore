@@ -4,3 +4,5 @@ image/
 # 원본 소스 스프레드시트/HWPX (실명 PII 포함, 공개 저장소에는 올리지 않음 — data_*.js에 이미 반영됨)
 *.xlsx
 *.hwpx
+
+.vercel
